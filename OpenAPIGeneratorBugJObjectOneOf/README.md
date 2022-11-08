@@ -1,0 +1,2 @@
+# Verifying that the *fix* works
+1. Debug line 13 in the test written in the `OpenAPIGeneratorBugJObjectOneOf.xUnit` project in the `OneOfTest.cs` file and see that the model actually deserialized it correctly according to the `test.json` file in the same project.
