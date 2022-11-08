@@ -1,0 +1,29 @@
+openapi: 3.0.0
+info:
+    title: "OneOf Test"
+    version: 1.0.0
+paths:
+    "/v1/oneOf/test":
+        get:
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: "#/components/schemas/oneOfSchema"
+                "404":
+                    description: "Not Found"
+components:
+    schemas:
+        oneOfSchema:
+            title: OneOf
+            properties:
+                key:
+                    type: string
+                value:
+                    oneOf:
+                        - type: number
+                        - type: string
+                        - type: boolean
+            type: object
