@@ -8,12 +8,21 @@
  */
 
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.ComponentModel.DataAnnotations;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
-using JsonSerializer = System.Text.Json.JsonSerializer;
+using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Linq;
+using System.ComponentModel.DataAnnotations;
+using OpenAPIDateConverter = Org.OpenAPITools.Client.OpenAPIDateConverter;
+using System.Reflection;
 
 namespace Org.OpenAPITools.Model
 {
@@ -166,11 +175,11 @@ namespace Org.OpenAPITools.Model
                 // if it does not contains "AdditionalProperties", use SerializerSettings to deserialize
                 if (typeof(bool).GetProperty("AdditionalProperties") == null)
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<bool>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<bool>(jsonString, OneOfSchemaValue.SerializerSettings));
                 }
                 else
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<bool>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<bool>(jsonString, OneOfSchemaValue.AdditionalPropertiesSerializerSettings));
                 }
                 matchedTypes.Add("bool");
                 match++;
@@ -186,11 +195,11 @@ namespace Org.OpenAPITools.Model
                 // if it does not contains "AdditionalProperties", use SerializerSettings to deserialize
                 if (typeof(decimal).GetProperty("AdditionalProperties") == null)
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<decimal>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<decimal>(jsonString, OneOfSchemaValue.SerializerSettings));
                 }
                 else
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<decimal>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<decimal>(jsonString, OneOfSchemaValue.AdditionalPropertiesSerializerSettings));
                 }
                 matchedTypes.Add("decimal");
                 match++;
@@ -206,11 +215,11 @@ namespace Org.OpenAPITools.Model
                 // if it does not contains "AdditionalProperties", use SerializerSettings to deserialize
                 if (typeof(string).GetProperty("AdditionalProperties") == null)
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<string>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<string>(jsonString, OneOfSchemaValue.SerializerSettings));
                 }
                 else
                 {
-                    newOneOfSchemaValue = new OneOfSchemaValue(JsonSerializer.Deserialize<string>(jsonString));
+                    newOneOfSchemaValue = new OneOfSchemaValue(JsonConvert.DeserializeObject<string>(jsonString, OneOfSchemaValue.AdditionalPropertiesSerializerSettings));
                 }
                 matchedTypes.Add("string");
                 match++;
@@ -286,7 +295,7 @@ namespace Org.OpenAPITools.Model
     /// <summary>
     /// Custom JSON converter for OneOfSchemaValue
     /// </summary>
-    public class OneOfSchemaValueJsonConverter : Newtonsoft.Json.JsonConverter
+    public class OneOfSchemaValueJsonConverter : JsonConverter
     {
         /// <summary>
         /// To write the JSON string
@@ -294,7 +303,7 @@ namespace Org.OpenAPITools.Model
         /// <param name="writer">JSON writer</param>
         /// <param name="value">Object to be converted into a JSON string</param>
         /// <param name="serializer">JSON Serializer</param>
-        public override void WriteJson(JsonWriter writer, object value, Newtonsoft.Json.JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
             writer.WriteRawValue((string)(typeof(OneOfSchemaValue).GetMethod("ToJson").Invoke(value, null)));
         }
@@ -307,11 +316,11 @@ namespace Org.OpenAPITools.Model
         /// <param name="existingValue">Existing value</param>
         /// <param name="serializer">JSON Serializer</param>
         /// <returns>The object converted from the JSON string</returns>
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, Newtonsoft.Json.JsonSerializer serializer)
+        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
             if(reader.TokenType != JsonToken.Null)
             {
-                return OneOfSchemaValue.FromJson(JToken.Load(reader).ToString(Formatting.None));
+                return OneOfSchemaValue.FromJson(JObject.Load(reader).ToString(Formatting.None));
             }
             return null;
         }
